@@ -1,0 +1,42 @@
+# ============================================================
+# CRM «Учет рабочих» — правила Apache
+# ============================================================
+
+# Запрет листинга каталогов
+Options -Indexes
+
+# Защита служебных каталогов от прямого веб-доступа
+RedirectMatch 404 ^/(config|database|includes)(/|$)
+RedirectMatch 404 ^/uploads/.*\.(php|phtml|phar|cgi|pl|py|sh)$
+
+# Защита скрытых файлов (.git, .env и т.п.)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Конфигурационные PHP-файлы не должны отдаваться напрямую нигде
+<Files "config.php">
+    Require all denied
+</Files>
+
+# Безопасные заголовки
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "same-origin"
+</IfModule>
+
+# Индексные файлы
+DirectoryIndex index.php index.html
+
+# Корректная обработка HTTPS за обратным прокси (ищите комментарий ниже)
+# SetEnvIf X-Forwarded-Proto "^https$" HTTPS=on
+
+# Кэширование статики
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+</IfModule>

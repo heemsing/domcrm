@@ -1,0 +1,54 @@
+/* Стили мастера установки CRM «Учет рабочих» */
+.install-body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1c2b4a 0%, #2d4a7a 60%, #3f6db5 100%);
+  padding: 32px 12px;
+}
+.install-wrap { width: 100%; max-width: 980px; margin: 0 auto; }
+.install-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.install-head {
+  background: #1c2b4a;
+  color: #fff;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.install-logo {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+}
+.install-steps-col { background: #f6f8fb; }
+.install-steps { padding: 16px 0; }
+.install-steps li {
+  padding: 10px 20px;
+  color: #64748b;
+  font-size: 14px;
+  display: flex; align-items: center; gap: 10px;
+  border-left: 3px solid transparent;
+}
+.install-steps li .step-num {
+  width: 26px; height: 26px; flex: 0 0 26px;
+  border-radius: 50%;
+  background: #e2e8f0; color: #475569;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 13px;
+}
+.install-steps li.active {
+  background: #fff; color: #0f172a; font-weight: 600;
+  border-left-color: #2563eb;
+}
+.install-steps li.active .step-num { background: #2563eb; color: #fff; }
+.install-steps li.done .step-num { background: #16a34a; color: #fff; }
+.req-table td { font-size: 14px; }
+.summary-table td { font-size: 15px; }
+@media (max-width: 767.98px) {
+  .install-steps-col { display: none; }
+}
