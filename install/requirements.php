@@ -41,11 +41,14 @@ $exts = [
     ['Zip (экспорт XLSX)', 'zip', false, 'Опционально: экспорт Excel.'],
     ['GD или Imagick (обработка фото)', (extension_loaded('gd') || extension_loaded('imagick')) ? 'gd' : 'no_gd', false, 'Опционально: миниатюры фотографий.'],
 ];
-foreach ($exts as [$label, $ext, $critical, $hint]) {
+foreach ($exts as [$label, $ext, $critical, $hint = null]) {
     if ($label === 'Session') {
         $ok = function_exists('session_start');
+    } elseif ($ext === 'no_gd') {
+        // Ни GD, ни Imagick не доступны.
+        $ok = false;
     } else {
-        $ok = $ext !== '' && $ext !== 'no_gd' && extension_loaded($ext);
+        $ok = $ext !== '' && extension_loaded($ext);
     }
     if (!$ok && $critical) {
         $criticalFail = true;
