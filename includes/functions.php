@@ -118,9 +118,8 @@ function audit_log(string $action, string $entity, ?int $entityId = null, ?array
 {
     try {
         // Не логируем чувствительные поля
-        foreach (['old_values', 'new_values'] as $k => $arr) {
-            $$k = is_array($arr) ? array_diff_key($arr, array_flip(['password', 'password_hash', 'db_pass'])) : $arr;
-        }
+        $old_values = is_array($old) ? array_diff_key($old, array_flip(['password', 'password_hash', 'db_pass'])) : $old;
+        $new_values = is_array($new) ? array_diff_key($new, array_flip(['password', 'password_hash', 'db_pass'])) : $new;
         db_query(
             'INSERT INTO ' . t('audit_logs') . ' (user_id, action, entity, entity_id, old_values, new_values, ip_address, user_agent)
              VALUES (?,?,?,?,?,?,?,?)',
