@@ -20,12 +20,26 @@ $prefix = $d['table_prefix'] ?? 'crm_';
 
 // ---------- AJAX endpoints ----------
 if (isset($_GET['ajax'])) {
+    // Если сессия мастера потерялась (протухла, сменился IP за балансировщиком,
+    // браузер не прислал cookie на fetch-запрос и т.п.) — восстанавливаем её,
+    // иначе запрос возвращал редирект/HTML вместо JSON и браузер показывал
+    // «Ошибка соединения с установщиком».
+    if (!isset($_SESSION['install'])) {
+        $_SESSION['install'] = [];
+    }
+    if (empty($_SESSION['install']['step1_ok'])) {
+        $_SESSION['install']['step1_ok'] = true;
+    }
+
     header('Content-Type: application/json; charset=utf-8');
     $action = $_GET['ajax'];
 
     if ($action === 'test') {
         $host = trim((string)($_POST['db_host'] ?? ''));
         $port = (int)($_POST['db_port'] ?? 3306);
+        if (($portRaw = trim((string)($_POST['db_port'] ?? ''))) !== '') {
+            $port = (ctype_digit($portRaw) && (int)$portRaw >= 1 && (int)$portRaw <= 65535) ? (int)$portRaw : 3306;
+        }
         $name = trim((string)($_POST['db_name'] ?? ''));
         $user = trim((string)($_POST['db_user'] ?? ''));
         $pass = (string)($_POST['db_pass'] ?? '');
@@ -59,6 +73,9 @@ if (isset($_GET['ajax'])) {
     if ($action === 'create_db') {
         $host = trim((string)($_POST['db_host'] ?? ''));
         $port = (int)($_POST['db_port'] ?? 3306);
+        if (($portRaw = trim((string)($_POST['db_port'] ?? ''))) !== '') {
+            $port = (ctype_digit($portRaw) && (int)$portRaw >= 1 && (int)$portRaw <= 65535) ? (int)$portRaw : 3306;
+        }
         $name = trim((string)($_POST['db_name'] ?? ''));
         $user = trim((string)($_POST['db_user'] ?? ''));
         $pass = (string)($_POST['db_pass'] ?? '');
@@ -194,10 +211,16 @@ install_header('Подключение MySQL', 3);
 
   async function ajax(url) {
     try {
-      const r = await fetch(url, {method: 'POST', body: data()});
-      const j = await r.json();
-      return j;
+      const r = await fetch(url, {method: 'POST', body: data(), credentials: 'same-origin'});
+      const text = await r.text();
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.error('Ответ установщика (не JSON):', r.status, text.slice(0, 500));
+        return {ok: false, html: 'Ошибка соединения с установщиком. Обновите страницу.'};
+      }
     } catch (e) {
+      console.error(e);
       return {ok: false, html: 'Ошибка соединения с установщиком. Обновите страницу.'};
     }
   }
