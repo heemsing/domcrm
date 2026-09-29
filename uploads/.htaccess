@@ -1,0 +1,14 @@
+# Запрет исполнения скриптов в хранилище файлов
+Options -Indexes -ExecCGI
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .phps
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule \.(php|phtml|phar|cgi|pl|py|sh)$ - [F,L]
+</IfModule>
+<FilesMatch "\.(php|phtml|phar)$">
+    Require all denied
+</FilesMatch>
